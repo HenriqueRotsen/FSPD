@@ -6,65 +6,102 @@
 
 #define NUM_RESOURCES 8
 
+int resourceArr[NUM_RESOURCES];
+
 // Estrutura para armazenar os parâmetros de cada thread
-typedef struct{
-    pthread_mutex_t resource_mutex[NUM_RESOURCES];
+typedef struct
+{
+    pthread_t thread;
     int tid;
     int free_time;
     int critical_time;
     int num_resources;
     int resources[NUM_RESOURCES];
-}ThreadParams;
+} Thread;
 
+Thread threads[1000];
 
-void init_recursos(ThreadParams *recursos) {
-    for (int i = 0; i < NUM_RESOURCES; i++) {
-        pthread_mutex_init(&recursos->resource_mutex[i], NULL);
-    }
-    // Inicialize outros campos da estrutura de recursos
-}
-
-void trava_recursos(ThreadParams *recursos, int *resources, int num_resources) {
-    for (int i = 0; i < num_resources; i++) {
-        pthread_mutex_lock(&recursos->resource_mutex[resources[i]]);
+void init_recursos()
+{
+    for (int i = 0; i < NUM_RESOURCES; i++)
+    {
+        resourceArr[i] = 0;
     }
 }
 
-void libera_recursos(ThreadParams *recursos, int *resources, int num_resources) {
-    for (int i = 0; i < num_resources; i++) {
-        pthread_mutex_unlock(&recursos->resource_mutex[resources[i]]);
+void trava_recursos(int resources[], int num_resources)
+{
+    
+    int free = 1;
+    for (int i = 0; i < num_resources; i++)
+    {
+        if (resourceArr[resources[i]] == 1)
+        {
+            free = 0;
+            break;
+        }
+    }
+    if (free == 1)
+    {
+        for (int i = 0; i < num_resources; i++)
+        {
+            resourceArr[resources[i]] = 1;
+        }
     }
 }
 
-void *thread_function(void *arg) {
-    struct ThreadParams *params = (struct ThreadParams *)arg;
+void libera_recursos(int *resources, int num_resources)
+{
+    for (int i = 0; i < num_resources; i++)
+    {
+        pthread_mutex_unlock(&thread->resources[resources[i]]);
+    }
+}
 
-    spend_time(params->tid, NULL, params->free_time);
-    trava_recursos(&recursos, params->resources, params->num_resources);
-    spend_time(params->tid, "C", params->critical_time);
-    libera_recursos(&recursos, params->resources, params->num_resources);
+void *thread_function(void *arg)
+{
+    Thread *threads = (Thread *)arg;
+
+    spend_time(threads->tid, NULL, threads->free_time);
+    trava_recursos(threads->resources, threads->num_resources);
+    spend_time(threads->tid, "C", threads->critical_time);
+    libera_recursos(threads->resources, threads->num_resources);
 
     pthread_exit(NULL);
 }
 
-int main() {
+int main()
+{
     init_recursos();
     int tid, free_time, critical_time, num_resources;
+    int cont = 0, aux;
 
-    while (scanf("%d %d %d %d", &tid, &free_time, &critical_time, &num_resources) != EOF) {
-        struct ThreadParams *params = (struct ThreadParams *)malloc(sizeof(struct ThreadParams));
-        params->tid = tid;
-        params->free_time = free_time;
-        params->critical_time = critical_time;
-        params->num_resources = num_resources;
+    // para cada thread
+    for (int i = 0;; i++)
+    {
+        scanf("%d %d %d", &tid, &free_time, &critical_time) != EOF;
+        threads[i].tid = tid;
+        threads[i].free_time = free_time;
+        threads[i].critical_time = critical_time;
+        threads[i].num_resources = 0;
 
-        for (int i = 0; i < num_resources; i++) {
-            scanf("%d", &params->resources[i]);
+        // ler os recursos
+        for (int j = 0;; j++)
+        {
+            scanf("%d", &aux);
+            if (aux == '\n')
+            {
+                break;
+            }
+            threads[i].resources[j] = aux;
+            threads[i].num_resources++;
         }
-
-        pthread_t thread;
-        pthread_create(&thread, NULL, thread_function, params);
+        pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
+        cont++;
     }
 
-    pthread_exit(NULL);
+    for (int i = 0; i < cont; i++)
+    {
+        pthread_join(&threads[i].thread, NULL);
+    }
 }
