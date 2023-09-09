@@ -6,7 +6,9 @@
 
 #define NUM_RESOURCES 8
 
-int resourceArr[NUM_RESOURCES];
+int resourceArr[NUM_RESOURCES]; //Array que diz se um recurso está travado ou não
+
+pthread_mutex_t mutex; //Declaração do mutex
 
 // Estrutura para armazenar os parâmetros de cada thread
 typedef struct
@@ -31,7 +33,7 @@ void init_recursos()
 
 void trava_recursos(int resources[], int num_resources)
 {
-    
+    pthread_mutex_lock(&mutex);
     int free = 1;
     for (int i = 0; i < num_resources; i++)
     {
@@ -48,13 +50,14 @@ void trava_recursos(int resources[], int num_resources)
             resourceArr[resources[i]] = 1;
         }
     }
+    pthread_mutex_unlock(&mutex);
 }
 
 void libera_recursos(int *resources, int num_resources)
 {
     for (int i = 0; i < num_resources; i++)
     {
-        pthread_mutex_unlock(&thread->resources[resources[i]]);
+        resourceArr[resources[i]] = 0;
     }
 }
 
