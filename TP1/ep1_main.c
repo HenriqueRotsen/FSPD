@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -82,29 +83,42 @@ int main()
     // para cada thread
     for (int i = 0;; i++)
     {
-        scanf("%d %d %d", &tid, &free_time, &critical_time) != EOF;
+        scanf("%d %d %d", &tid, &free_time, &critical_time);
         threads[i].tid = tid;
         threads[i].free_time = free_time;
         threads[i].critical_time = critical_time;
         threads[i].num_resources = 0;
 
+        printf("%d %d %d\n", threads[i].tid, threads[i].free_time, threads[i].critical_time);
+        
         // ler os recursos
-        for (int j = 0;; j++)
-        {
-            scanf("%d", &aux);
-            if (aux == '\n')
-            {
-                break;
-            }
-            threads[i].resources[j] = aux;
-            threads[i].num_resources++;
+        char linha[1000]; // Assumindo um tamanho máximo de 1000 caracteres por linha
+        int num;
+
+        // Ler uma linha inteira
+        fgets(linha, sizeof(linha), stdin);
+
+        // Usar sscanf para extrair os números
+        while (sscanf(linha, "%d", &num) == 1) {
+            // Faça alguma coisa com o número, por exemplo, imprima-o
+            printf("Você digitou: %d\n", num);
+
+            // Avançar para o próximo número na linha
+            linha += strspn(linha, "0123456789") + 1;
         }
-        pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
+        
+        for (int j=0;j<NUM_RESOURCES; j++)
+        {
+            printf("%d ", threads[i].resources[j]);
+        }
+        printf("\n");
+        
+        //pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
         cont++;
     }
 
     for (int i = 0; i < cont; i++)
     {
-        pthread_join(&threads[i].thread, NULL);
+        //pthread_join(threads[i].thread, NULL);
     }
 }
