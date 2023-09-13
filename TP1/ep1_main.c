@@ -8,6 +8,7 @@
 #define NUM_RESOURCES 8
 
 int resourceArr[NUM_RESOURCES]; //Array que diz se um recurso está travado ou não
+pthread_cond_t new_resources;
 
 pthread_mutex_t mutex; //Declaração do mutex
 
@@ -36,21 +37,29 @@ void trava_recursos(int resources[], int num_resources)
 {
     pthread_mutex_lock(&mutex);
     int free = 1;
-    for (int i = 0; i < num_resources; i++)
-    {
-        if (resourceArr[resources[i]] == 1)
-        {
-            free = 0;
-            break;
-        }
-    }
-    if (free == 1)
-    {
+    do{
+        free = 1;
         for (int i = 0; i < num_resources; i++)
         {
-            resourceArr[resources[i]] = 1;
+            if (resourceArr[resources[i]] == 1)
+            {
+                free = 0;
+                break;
+            }
+        }
+        if (free == 1)
+        {
+            for (int i = 0; i < num_resources; i++)
+            {
+                resourceArr[resources[i]] = 1;
+            }
+        }
+        else
+        {
+            pthread_cond_wait(&new_resources, &mutex);
         }
     }
+    while(!free);
     pthread_mutex_unlock(&mutex);
 }
 
@@ -60,6 +69,7 @@ void libera_recursos(int *resources, int num_resources)
     {
         resourceArr[resources[i]] = 0;
     }
+    pthread_cond_broadcast(&new_resources);
 }
 
 void *thread_function(void *arg)
@@ -79,6 +89,7 @@ int main()
     init_recursos();
     int tid, free_time, critical_time, num_resources;
     int cont = 0, aux;
+    pthread_cond_init(&new_resources, NULL);
 
     // para cada thread
     for (int i = 0;; i++)
@@ -96,29 +107,27 @@ int main()
         int num;
 
         // Ler uma linha inteira
-        fgets(linha, sizeof(linha), stdin);
+        fgets(linha, sizeof(linha), stdin); 
 
         // Usar sscanf para extrair os números
-        while (sscanf(linha, "%d", &num) == 1) {
+        while (sscanf(linha, "%d", &num) == 1) 
+        {
             // Faça alguma coisa com o número, por exemplo, imprima-o
             printf("Você digitou: %d\n", num);
 
-            // Avançar para o próximo número na linha
-            linha += strspn(linha, "0123456789") + 1;
+            for (int j=0;j<NUM_RESOURCES; j++)
+            {
+                printf("%d ", threads[i].resources[j]);
+            }
+            printf("\n");
+
+            pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
+            cont++;
         }
-        
-        for (int j=0;j<NUM_RESOURCES; j++)
-        {
-            printf("%d ", threads[i].resources[j]);
-        }
-        printf("\n");
-        
-        //pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
-        cont++;
     }
 
     for (int i = 0; i < cont; i++)
     {
-        //pthread_join(threads[i].thread, NULL);
+        pthread_join(threads[i].thread, NULL);
     }
 }
