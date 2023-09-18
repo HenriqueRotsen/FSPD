@@ -7,10 +7,10 @@
 
 #define NUM_RESOURCES 8
 
-int resourceArr[NUM_RESOURCES]; //Array que diz se um recurso está travado ou não
-pthread_cond_t new_resources;
+int resourceArr[NUM_RESOURCES]; // Array que diz se um recurso está travado ou não
+pthread_cond_t new_resources; // Variavel de condição que indica a presença de um novo recurso disponível
 
-pthread_mutex_t mutex; //Declaração do mutex
+pthread_mutex_t mutex; // Declaração do mutex
 
 // Estrutura para armazenar os parâmetros de cada thread
 typedef struct
@@ -23,6 +23,7 @@ typedef struct
     int resources[NUM_RESOURCES];
 } Thread;
 
+// Definindo uma certa quantidade de threads
 Thread threads[1000];
 
 void init_recursos()
@@ -33,42 +34,60 @@ void init_recursos()
     }
 }
 
+// Função para travar os recursos
 void trava_recursos(int resources[], int num_resources)
 {
+    // Trava a mutex para apenas uma thread acessar a sessão critica
     pthread_mutex_lock(&mutex);
+
+    // Variável que indica de os recursos estão livres, inicialmente sim (1)
     int free = 1;
     do{
         free = 1;
+        // Para todos os recursos que ele pede
         for (int i = 0; i < num_resources; i++)
         {
+            // Verifica se os recursos estão sendo usados
             if (resourceArr[resources[i]] == 1)
             {
                 free = 0;
                 break;
             }
         }
+        // Se todos os recursos estiverem livres
         if (free == 1)
         {
+            // Marque eles como travados
             for (int i = 0; i < num_resources; i++)
             {
                 resourceArr[resources[i]] = 1;
             }
         }
+        // Senão espere ate que algum seja liberado e tente novamente
         else
         {
             pthread_cond_wait(&new_resources, &mutex);
         }
     }
     while(!free);
+
+    // Destrava a mutex
     pthread_mutex_unlock(&mutex);
 }
 
+/* Função para liberar os recursos
+   Nesse caso, não bloqueio a mutex pois nunca deve acontecer de
+   2 ou mais threads tentarem destravar o mesmo recurso, logo o
+   acesso não é crítico 
+*/
 void libera_recursos(int *resources, int num_resources)
 {
     for (int i = 0; i < num_resources; i++)
     {
         resourceArr[resources[i]] = 0;
     }
+    
+    // Avisa a todos que estiverem esperando que novos recursos estão disponíveis
     pthread_cond_broadcast(&new_resources);
 }
 
