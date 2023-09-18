@@ -92,7 +92,7 @@ int main()
     pthread_cond_init(&new_resources, NULL);
 
     // para cada thread
-    for (int i = 0;; i++)
+    for (int i = 0; i<4; i++)
     {
         scanf("%d %d %d", &tid, &free_time, &critical_time);
         threads[i].tid = tid;
@@ -100,30 +100,31 @@ int main()
         threads[i].critical_time = critical_time;
         threads[i].num_resources = 0;
 
-        printf("%d %d %d\n", threads[i].tid, threads[i].free_time, threads[i].critical_time);
+        //printf("%d %d %d\n", threads[i].tid, threads[i].free_time, threads[i].critical_time);
         
         // ler os recursos
-        char linha[1000]; // Assumindo um tamanho máximo de 1000 caracteres por linha
-        int num;
+        char linha[100]; // Assumindo um tamanho máximo de 1000 caracteres por linha
+        char *ptr = linha; // Ponteiro para percorrer a linha
+        int num, k=0;
 
         // Ler uma linha inteira
         fgets(linha, sizeof(linha), stdin); 
 
+        // Ignora qualquer espaço em branco
+        ptr += strspn(ptr, " \t");
+        
         // Usar sscanf para extrair os números
-        while (sscanf(linha, "%d", &num) == 1) 
+        while (sscanf(ptr, " %d", &num) == 1) 
         {
-            // Faça alguma coisa com o número, por exemplo, imprima-o
-            printf("Você digitou: %d\n", num);
+            threads[i].resources[k] = num;
+            threads[i].num_resources++;
+            k++;
 
-            for (int j=0;j<NUM_RESOURCES; j++)
-            {
-                printf("%d ", threads[i].resources[j]);
-            }
-            printf("\n");
-
-            pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
-            cont++;
+            // Avançar para o próximo número na linha
+            ptr += strspn(ptr, "0123456789") + 1;
         }
+        cont++;
+        pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
     }
 
     for (int i = 0; i < cont; i++)
