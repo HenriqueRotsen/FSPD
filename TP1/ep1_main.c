@@ -8,7 +8,7 @@
 #define NUM_RESOURCES 8
 
 int resourceArr[NUM_RESOURCES]; // Array que diz se um recurso está travado ou não
-pthread_cond_t new_resources; // Variavel de condição que indica a presença de um novo recurso disponível
+pthread_cond_t new_resources;   // Variavel de condição que indica a presença de um novo recurso disponível
 
 pthread_mutex_t mutex; // Declaração do mutex
 
@@ -42,7 +42,8 @@ void trava_recursos(int resources[], int num_resources)
 
     // Variável que indica de os recursos estão livres, inicialmente sim (1)
     int free = 1;
-    do{
+    do
+    {
         free = 1;
         // Para todos os recursos que ele pede
         for (int i = 0; i < num_resources; i++)
@@ -68,8 +69,7 @@ void trava_recursos(int resources[], int num_resources)
         {
             pthread_cond_wait(&new_resources, &mutex);
         }
-    }
-    while(!free);
+    } while (!free);
 
     // Destrava a mutex
     pthread_mutex_unlock(&mutex);
@@ -78,15 +78,24 @@ void trava_recursos(int resources[], int num_resources)
 /* Função para liberar os recursos
    Nesse caso, não bloqueio a mutex pois nunca deve acontecer de
    2 ou mais threads tentarem destravar o mesmo recurso, logo o
-   acesso não é crítico 
+   acesso não é crítico
 */
-void libera_recursos(int *resources, int num_resources)
+void libera_recursos()
 {
-    for (int i = 0; i < num_resources; i++)
+    int i;
+    for (i = 0; i < 1000; i++)
     {
-        resourceArr[resources[i]] = 0;
+        if (threads[i].thread == pthread_self())
+        {
+            break;
+        }
     }
-    
+
+    for (int j = 0; j < threads[i].num_resources; j++)
+    {
+        resourceArr[threads[i].resources[j]] = 0;
+    }
+
     // Avisa a todos que estiverem esperando que novos recursos estão disponíveis
     pthread_cond_broadcast(&new_resources);
 }
@@ -98,7 +107,7 @@ void *thread_function(void *arg)
     spend_time(threads->tid, NULL, threads->free_time);
     trava_recursos(threads->resources, threads->num_resources);
     spend_time(threads->tid, "C", threads->critical_time);
-    libera_recursos(threads->resources, threads->num_resources);
+    libera_recursos();
 
     pthread_exit(NULL);
 }
@@ -111,39 +120,38 @@ int main()
     pthread_cond_init(&new_resources, NULL);
 
     // para cada thread
-    for (int i = 0; i<4; i++)
+    while (scanf("%d %d %d", &tid, &free_time, &critical_time) != EOF)
     {
-        scanf("%d %d %d", &tid, &free_time, &critical_time);
-        threads[i].tid = tid;
-        threads[i].free_time = free_time;
-        threads[i].critical_time = critical_time;
-        threads[i].num_resources = 0;
+        threads[cont].tid = tid;
+        threads[cont].free_time = free_time;
+        threads[cont].critical_time = critical_time;
+        threads[cont].num_resources = 0;
 
-        //printf("%d %d %d\n", threads[i].tid, threads[i].free_time, threads[i].critical_time);
-        
+        // printf("%d %d %d\n", threads[cont].tid, threads[cont].free_time, threads[cont].critical_time);
+
         // ler os recursos
-        char linha[100]; // Assumindo um tamanho máximo de 1000 caracteres por linha
+        char linha[100];   // Assumindo um tamanho máximo de 1000 caracteres por linha
         char *ptr = linha; // Ponteiro para percorrer a linha
-        int num, k=0;
+        int num, k = 0;
 
         // Ler uma linha inteira
-        fgets(linha, sizeof(linha), stdin); 
+        fgets(linha, sizeof(linha), stdin);
 
         // Ignora qualquer espaço em branco
         ptr += strspn(ptr, " \t");
-        
+
         // Usar sscanf para extrair os números
-        while (sscanf(ptr, " %d", &num) == 1) 
+        while (sscanf(ptr, " %d", &num) == 1)
         {
-            threads[i].resources[k] = num;
-            threads[i].num_resources++;
+            threads[cont].resources[k] = num;
+            threads[cont].num_resources++;
             k++;
 
             // Avançar para o próximo número na linha
             ptr += strspn(ptr, "0123456789") + 1;
         }
+        pthread_create(&threads[cont].thread, NULL, thread_function, (void *)&threads[cont]);
         cont++;
-        pthread_create(&threads[i].thread, NULL, thread_function, (void *)&threads[i]);
     }
 
     for (int i = 0; i < cont; i++)
