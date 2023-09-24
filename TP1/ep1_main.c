@@ -127,8 +127,6 @@ int main()
         threads[cont].critical_time = critical_time;
         threads[cont].num_resources = 0;
 
-        // printf("%d %d %d\n", threads[cont].tid, threads[cont].free_time, threads[cont].critical_time);
-
         // ler os recursos
         char linha[100];   // Assumindo um tamanho máximo de 1000 caracteres por linha
         char *ptr = linha; // Ponteiro para percorrer a linha
@@ -150,6 +148,7 @@ int main()
             // Avançar para o próximo número na linha
             ptr += strspn(ptr, "0123456789") + 1;
         }
+
         pthread_create(&threads[cont].thread, NULL, thread_function, (void *)&threads[cont]);
         cont++;
     }

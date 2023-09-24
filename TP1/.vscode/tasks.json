@@ -11,8 +11,6 @@
                 "spend_time.c",
                 "ep1_main.c",
                 "-lm",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
             ],
             "options": {
                 "cwd": "${fileDirname}"
