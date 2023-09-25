@@ -75,15 +75,12 @@ void trava_recursos(int resources[], int num_resources)
     pthread_mutex_unlock(&mutex);
 }
 
-/* Função para liberar os recursos
-   Nesse caso, não bloqueio a mutex pois nunca deve acontecer de
-   2 ou mais threads tentarem destravar o mesmo recurso, logo o
-   acesso não é crítico
-*/
+// Função para liberar os recursos
 void libera_recursos()
 {
     pthread_mutex_lock(&mutex);
     int i;
+    // Descobrindo qual a Thread que chamou a função
     for (i = 0; i < 1000; i++)
     {
         if (threads[i].thread == pthread_self())
@@ -107,12 +104,6 @@ void *thread_function(void *arg)
     Thread *threads = (Thread *)arg;
 
     spend_time(threads->tid, NULL, threads->free_time);
-    //printf("A thread %d vai entrar na sessao critica, os recursos solicitados serão:\n", threads->tid);
-    //for (int i = 0; i < threads->num_resources; i++)
-    //{
-    //    printf("Recurso: %d\n", threads->resources[i]);
-    //}
-    //printf("\n");
     trava_recursos(threads->resources, threads->num_resources);
     spend_time(threads->tid, "C", threads->critical_time);
     libera_recursos();
@@ -123,8 +114,7 @@ void *thread_function(void *arg)
 int main()
 {
     init_recursos();
-    int tid, free_time, critical_time, num_resources;
-    int cont = 0, aux;
+    int tid, free_time, critical_time, num_resources, cont = 0;
     pthread_cond_init(&new_resources, NULL);
 
     // para cada thread
@@ -135,8 +125,7 @@ int main()
         threads[cont].critical_time = critical_time;
         threads[cont].num_resources = 0;
 
-        // ler os recursos
-        char linha[100];   // Assumindo um tamanho máximo de 1000 caracteres por linha
+        char linha[100]; // Assumindo um tamanho máximo de 100 caracteres por linha
         memset(linha, 0, 100);
         char *ptr = linha; // Ponteiro para percorrer a linha
         int num, k = 0;
