@@ -82,6 +82,7 @@ void trava_recursos(int resources[], int num_resources)
 */
 void libera_recursos()
 {
+    pthread_mutex_lock(&mutex);
     int i;
     for (i = 0; i < 1000; i++)
     {
@@ -98,6 +99,7 @@ void libera_recursos()
 
     // Avisa a todos que estiverem esperando que novos recursos estão disponíveis
     pthread_cond_broadcast(&new_resources);
+    pthread_mutex_unlock(&mutex);
 }
 
 void *thread_function(void *arg)
@@ -105,6 +107,12 @@ void *thread_function(void *arg)
     Thread *threads = (Thread *)arg;
 
     spend_time(threads->tid, NULL, threads->free_time);
+    //printf("A thread %d vai entrar na sessao critica, os recursos solicitados serão:\n", threads->tid);
+    //for (int i = 0; i < threads->num_resources; i++)
+    //{
+    //    printf("Recurso: %d\n", threads->resources[i]);
+    //}
+    //printf("\n");
     trava_recursos(threads->resources, threads->num_resources);
     spend_time(threads->tid, "C", threads->critical_time);
     libera_recursos();
@@ -129,6 +137,7 @@ int main()
 
         // ler os recursos
         char linha[100];   // Assumindo um tamanho máximo de 1000 caracteres por linha
+        memset(linha, 0, 100);
         char *ptr = linha; // Ponteiro para percorrer a linha
         int num, k = 0;
 
