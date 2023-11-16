@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+service KeyValueStore {
+  rpc Insert (KeyValueRequest) returns (Response);
+  rpc Consult (KeyRequest) returns (Response);
+  rpc Activate (ActivationRequest) returns (Response);
+  rpc Terminate (EmptyRequest) returns (Response);
+}
+
+message KeyValueRequest {
+  int32 key = 1;
+  string value = 2;
+}
+
+message KeyRequest {
+  int32 key = 1;
+}
+
+message ActivationRequest {
+  string service_identifier = 1;
+}
+
+message Response {
+  int32 result = 1;
+  string value = 2;
+}
+
+message EmptyRequest {}
