@@ -4,7 +4,7 @@ service KeyValueStore {
   rpc Insert (KeyValueRequest) returns (Response);
   rpc Consult (KeyRequest) returns (Response);
   rpc Activate (ActivationRequest) returns (Response);
-  rpc Terminate (EmptyRequest) returns (Response);
+  rpc Terminate (TerminateRequest) returns (Response);
 }
 
 message KeyValueRequest {
@@ -25,4 +25,4 @@ message Response {
   string value = 2;
 }
 
-message EmptyRequest {}
+message TerminateRequest {}
