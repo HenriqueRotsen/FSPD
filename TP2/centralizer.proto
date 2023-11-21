@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+service Centralizer {
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc MapKey(MapKeyRequest) returns (MapKeyResponse);
+    rpc Terminate(TerminateRequest) returns (RegisterResponse);
+}
+
+message RegisterRequest {
+    string identifier = 1;
+    repeated int32 keys = 2;
+}
+
+message RegisterResponse {
+    int32 num_keys = 1;
+}
+
+message MapKeyRequest {
+    int32 key = 1;
+}
+
+message MapKeyResponse {
+    string identifier = 1;
+}
+
+message TerminateRequest {}
