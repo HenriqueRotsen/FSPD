@@ -1,11 +1,13 @@
-import grpc
 from concurrent import futures
-import centralizer_pb2
-import centralizer_pb2_grpc
+import sys
+import grpc
+import threading
+import centralizer_pb2, centralizer_pb2_grpc
 
 class CentralizerServicer(centralizer_pb2_grpc.CentralizerServicer):
-    def __init__(self):
+    def __init__(self, stop_event):
         self.key_directory = {}
+        self._stop_event = stop_event
 
     def Register(self, request, context):
         identifier = request.identifier
@@ -23,17 +25,18 @@ class CentralizerServicer(centralizer_pb2_grpc.CentralizerServicer):
         return centralizer_pb2.MapKeyResponse(identifier=identifier)
 
     def Terminate(self, request, context):
-        num_keys = len(self.key_directory)
-        context.abort()
+        self._stop_event.set()
+        return centralizer_pb2.RegisterResponse(num_keys= len(self.key_directory.keys()))
 
 def serve():
+    stop_event = threading.Event()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    centralizer_pb2_grpc.add_CentralizerServicer_to_server(CentralizerServicer(), server)
-    port = 50052  # Defina a porta desejada para o servidor centralizador
+    centralizer_pb2_grpc.add_CentralizerServicer_to_server(CentralizerServicer(stop_event), server)
+    port = sys.argv[1]
     server.add_insecure_port(f'[::]:{port}')
     server.start()
-    print(f'Servidor Centralizador iniciado na porta {port}')
-    server.wait_for_termination()
+    stop_event.wait()
+    server.stop(grace=None)
 
 if __name__ == '__main__':
     serve()

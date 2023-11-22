@@ -24,9 +24,9 @@ def run():
             print(response.value)
 
         elif command[0] == 'A':
-            service_identifier = command[1]
-            request = storage_pb2.ActivationRequest(service_identifier=service_identifier)
-            response = stub.Activate(activate)
+            server_ip = command[1]
+            request = storage_pb2.ActivationRequest(service_identifier=server_ip)
+            response = stub.Activate(storage_pb2.ActivationRequest(service_identifier=server_ip))
             print(response.result)
 
         elif command[0] == 'T':
