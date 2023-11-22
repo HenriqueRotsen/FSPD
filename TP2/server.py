@@ -31,7 +31,7 @@ class KeyValueStoreServicer(storage_pb2_grpc.KeyValueStoreServicer):
         if self.activation_flag:
             channel = grpc.insecure_channel(request.service_identifier)
             stub = centralizer_pb2_grpc.CentralizerStub(channel)
-            response = stub.registro(centralizer_pb2.RegisterRequest(identifier=f'{socket.getfqdn()}:{sys.argv[1]}', keys=self.key_value_store.keys()))
+            response = stub.Register(centralizer_pb2.RegisterRequest(identifier=f'{socket.getfqdn()}:{sys.argv[1]}', keys=self.key_value_store.keys()))
             
             return storage_pb2.Response(result=response.num_keys)
         else:
