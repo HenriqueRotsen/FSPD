@@ -3,7 +3,7 @@ syntax = "proto3";
 service Centralizer {
     rpc Register(RegisterRequest) returns (RegisterResponse);
     rpc MapKey(MapKeyRequest) returns (MapKeyResponse);
-    rpc Terminate(TerminateRequest) returns (RegisterResponse);
+    rpc Terminate(TerminateRequestCentral) returns (RegisterResponse);
 }
 
 message RegisterRequest {
@@ -23,4 +23,4 @@ message MapKeyResponse {
     string identifier = 1;
 }
 
-message TerminateRequest {}
+message TerminateRequestCentral {}

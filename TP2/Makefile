@@ -5,13 +5,13 @@ all:
 clean:
 	rm *_pb2*.py
 
-run_serv_pares_1:
+run_serv_pares_1:all
 	python3 server.py ${arg}
-run_serv_pares_2:
+run_serv_pares_2:all
 	python3 server.py ${arg} flag
-run_cli_pares:
+run_cli_pares:all
 	python3 client.py ${arg}
-run_cli_central:
+run_cli_central:all
 	python3 central_client.py ${arg}
-run_serv_central:
+run_serv_central:all
 	python3 central_server.py ${arg}

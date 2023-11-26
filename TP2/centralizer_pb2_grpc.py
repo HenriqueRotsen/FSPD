@@ -26,7 +26,7 @@ class CentralizerStub(object):
                 )
         self.Terminate = channel.unary_unary(
                 '/Centralizer/Terminate',
-                request_serializer=centralizer__pb2.TerminateRequest.SerializeToString,
+                request_serializer=centralizer__pb2.TerminateRequestCentral.SerializeToString,
                 response_deserializer=centralizer__pb2.RegisterResponse.FromString,
                 )
 
@@ -67,7 +67,7 @@ def add_CentralizerServicer_to_server(servicer, server):
             ),
             'Terminate': grpc.unary_unary_rpc_method_handler(
                     servicer.Terminate,
-                    request_deserializer=centralizer__pb2.TerminateRequest.FromString,
+                    request_deserializer=centralizer__pb2.TerminateRequestCentral.FromString,
                     response_serializer=centralizer__pb2.RegisterResponse.SerializeToString,
             ),
     }
@@ -126,7 +126,7 @@ class Centralizer(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Centralizer/Terminate',
-            centralizer__pb2.TerminateRequest.SerializeToString,
+            centralizer__pb2.TerminateRequestCentral.SerializeToString,
             centralizer__pb2.RegisterResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

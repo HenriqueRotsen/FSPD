@@ -31,7 +31,7 @@ class KeyValueStoreStub(object):
                 )
         self.Terminate = channel.unary_unary(
                 '/KeyValueStore/Terminate',
-                request_serializer=storage__pb2.EmptyRequest.SerializeToString,
+                request_serializer=storage__pb2.TerminateRequest.SerializeToString,
                 response_deserializer=storage__pb2.Response.FromString,
                 )
 
@@ -83,7 +83,7 @@ def add_KeyValueStoreServicer_to_server(servicer, server):
             ),
             'Terminate': grpc.unary_unary_rpc_method_handler(
                     servicer.Terminate,
-                    request_deserializer=storage__pb2.EmptyRequest.FromString,
+                    request_deserializer=storage__pb2.TerminateRequest.FromString,
                     response_serializer=storage__pb2.Response.SerializeToString,
             ),
     }
@@ -159,7 +159,7 @@ class KeyValueStore(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/KeyValueStore/Terminate',
-            storage__pb2.EmptyRequest.SerializeToString,
+            storage__pb2.TerminateRequest.SerializeToString,
             storage__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

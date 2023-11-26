@@ -12,7 +12,7 @@ def map_key(channel, key):
 # Termina o programa
 def terminate(channel):
     stub = centralizer_pb2_grpc.CentralizerStub(channel)
-    response = stub.Terminate(centralizer_pb2.TerminateRequest())
+    response = stub.Terminate(centralizer_pb2.TerminateRequestCentral())
     return response.num_keys
 
 def main():

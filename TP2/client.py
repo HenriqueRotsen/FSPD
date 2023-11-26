@@ -36,7 +36,7 @@ def run():
 
         # Termina o programa
         elif command[0] == 'T':
-            request = storage_pb2.EmptyRequest()
+            request = storage_pb2.TerminateRequest()
             response = stub.Terminate(request)
             print(response.result)
             break

@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rstorage.proto\"-\n\x0fKeyValueRequest\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x19\n\nKeyRequest\x12\x0b\n\x03key\x18\x01 \x01(\x05\"/\n\x11\x41\x63tivationRequest\x12\x1a\n\x12service_identifier\x18\x01 \x01(\t\")\n\x08Response\x12\x0e\n\x06result\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x0e\n\x0c\x45mptyRequest2\xab\x01\n\rKeyValueStore\x12%\n\x06Insert\x12\x10.KeyValueRequest\x1a\t.Response\x12!\n\x07\x43onsult\x12\x0b.KeyRequest\x1a\t.Response\x12)\n\x08\x41\x63tivate\x12\x12.ActivationRequest\x1a\t.Response\x12%\n\tTerminate\x12\r.EmptyRequest\x1a\t.Responseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rstorage.proto\"-\n\x0fKeyValueRequest\x12\x0b\n\x03key\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x19\n\nKeyRequest\x12\x0b\n\x03key\x18\x01 \x01(\x05\"/\n\x11\x41\x63tivationRequest\x12\x1a\n\x12service_identifier\x18\x01 \x01(\t\")\n\x08Response\x12\x0e\n\x06result\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x12\n\x10TerminateRequest2\xaf\x01\n\rKeyValueStore\x12%\n\x06Insert\x12\x10.KeyValueRequest\x1a\t.Response\x12!\n\x07\x43onsult\x12\x0b.KeyRequest\x1a\t.Response\x12)\n\x08\x41\x63tivate\x12\x12.ActivationRequest\x1a\t.Response\x12)\n\tTerminate\x12\x11.TerminateRequest\x1a\t.Responseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,8 +28,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_ACTIVATIONREQUEST']._serialized_end=138
   _globals['_RESPONSE']._serialized_start=140
   _globals['_RESPONSE']._serialized_end=181
-  _globals['_EMPTYREQUEST']._serialized_start=183
-  _globals['_EMPTYREQUEST']._serialized_end=197
-  _globals['_KEYVALUESTORE']._serialized_start=200
-  _globals['_KEYVALUESTORE']._serialized_end=371
+  _globals['_TERMINATEREQUEST']._serialized_start=183
+  _globals['_TERMINATEREQUEST']._serialized_end=201
+  _globals['_KEYVALUESTORE']._serialized_start=204
+  _globals['_KEYVALUESTORE']._serialized_end=379
 # @@protoc_insertion_point(module_scope)
