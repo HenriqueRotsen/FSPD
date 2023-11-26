@@ -9,6 +9,7 @@ class CentralizerServicer(centralizer_pb2_grpc.CentralizerServicer):
         self.key_directory = {}
         self._stop_event = stop_event
 
+    # Registra os daos em um dicionario
     def Register(self, request, context):
         identifier = request.identifier
         keys = request.keys
@@ -19,15 +20,18 @@ class CentralizerServicer(centralizer_pb2_grpc.CentralizerServicer):
 
         return centralizer_pb2.RegisterResponse(num_keys=len(keys))
 
+    # Acha o endereco resposnsavel pela chave passada
     def MapKey(self, request, context):
         key = request.key
         identifier = self.key_directory.get(key, '')
         return centralizer_pb2.MapKeyResponse(identifier=identifier)
 
+    # Termina o programa
     def Terminate(self, request, context):
         self._stop_event.set()
         return centralizer_pb2.RegisterResponse(num_keys= len(self.key_directory.keys()))
 
+# Inicio do programa com algumas configuracoes
 def serve():
     stop_event = threading.Event()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

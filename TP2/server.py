@@ -1,4 +1,3 @@
-from ast import arg
 import grpc
 import threading
 import sys
@@ -13,6 +12,7 @@ class KeyValueStoreServicer(storage_pb2_grpc.KeyValueStoreServicer):
         self.activation_flag = len(sys.argv) == 3
         self.stop_event = stop_event
 
+    # Insere a chave no dicionario
     def Insert(self, request, context):
         key = request.key
         value = request.value
@@ -22,25 +22,30 @@ class KeyValueStoreServicer(storage_pb2_grpc.KeyValueStoreServicer):
         else:
             return storage_pb2.Response(result=-1)
 
+    # Consulta o valor associado a chave
     def Consult(self, request, context):
         key = request.key
         value = self.key_value_store.get(key, "")
         return storage_pb2.Response(result=0, value=value)
 
+    # Informa o servidor central de que ele detem as chaves
     def Activate(self, request, context):
         if self.activation_flag:
             channel = grpc.insecure_channel(request.service_identifier)
             stub = centralizer_pb2_grpc.CentralizerStub(channel)
             response = stub.Register(centralizer_pb2.RegisterRequest(identifier=f'{socket.getfqdn()}:{sys.argv[1]}', keys=self.key_value_store.keys()))
             
+            # O valor de retorno e a quantidade de chaves informadas
             return storage_pb2.Response(result=response.num_keys)
         else:
             return storage_pb2.Response(result=-1)
 
+    # Termina o programa
     def Terminate(self, request, context):
         self.stop_event.set()
         return storage_pb2.Response(result=0)
 
+# Configuracoes iniciais e abertura do servidor
 def serve():
     stop_event = threading.Event()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
